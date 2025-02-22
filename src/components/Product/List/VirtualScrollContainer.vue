@@ -1,12 +1,15 @@
+<!--<reference path="./useVirtualScrollContainer.d.ts" />-->
+
 <script setup lang="ts">
 import { defineProps, defineExpose, onUnmounted } from 'vue';
 import { useVirtualScroll } from '@/composables/useVirtualScroll.ts';
 import { useAnimations } from '@/composables/useAnimations.ts';
 import ProductCard from '@/components/Product/Card/index.vue';
+import { Product } from '@/types/product';
 import '@/styles/VirtualScroll.scss';
 
 const props = defineProps<{
-  items: any[];
+  items: Product[];
   itemHeight: number;
   containerHeight: number;
   buffer?: number;

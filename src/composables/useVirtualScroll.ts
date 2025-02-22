@@ -1,3 +1,5 @@
+/// <reference path="./useVirtualScroll.docs.ts" />
+
 import { ref, onMounted, onUnmounted, watch } from 'vue';
 import type { Product } from '@/types/product';
 import type {
