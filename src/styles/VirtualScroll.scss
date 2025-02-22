@@ -1,0 +1,70 @@
+// styles/VirtualScroll.scss
+.virtual-scroll {
+  &-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    scrollbar-width: none;
+    transition: opacity 0.2s ease;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  &-items {
+    scroll-snap-align: start;
+    transition: transform 0.1s linear;
+  }
+}
+
+.products-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  will-change: contents;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  transition: opacity 0.2s ease;
+}
+
+// Анимации
+.product-list {
+  &-move,
+  &-enter-active,
+  &-leave-active {
+    transition: all 0.3s ease;
+  }
+
+  &-enter-from,
+  &-leave-to {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  &-leave-active {
+    position: absolute;
+  }
+}
+
+.filtering {
+  animation: filter-animation 0.3s ease;
+}
+
+.scroll-animation {
+  transition: transform 0.15s ease-out;
+  will-change: transform;
+}
+
+@keyframes filter-animation {
+  0% {
+    opacity: 0.6;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
