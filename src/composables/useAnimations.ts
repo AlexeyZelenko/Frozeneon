@@ -3,7 +3,7 @@ import { ref } from 'vue';
 export function useAnimations() {
     const isFiltering = ref(false);
     const isScrolling = ref(false);
-    let scrollTimeout: NodeJS.Timeout;
+    let scrollTimeout: number;
 
     const startFilterAnimation = () => {
         isFiltering.value = true;
@@ -15,7 +15,7 @@ export function useAnimations() {
     const handleScrollAnimation = () => {
         isScrolling.value = true;
         clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => {
+        scrollTimeout = window.setTimeout(() => {
             isScrolling.value = false;
         }, 150);
     };
@@ -29,6 +29,6 @@ export function useAnimations() {
         isScrolling,
         startFilterAnimation,
         handleScrollAnimation,
-        cleanupAnimations
+        cleanupAnimations,
     };
 }

@@ -1,6 +1,10 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue';
-import { Product } from '@/types/product';
-import { VirtualScrollProps, VirtualScrollReturn } from '@/types/virtualScroll';
+import type { Product } from '@/types/product';
+import type {
+  VirtualScrollProps,
+  VirtualScrollReturn,
+  ScrollState
+} from '@/types/virtualScroll';
 
 export function useVirtualScroll(props: VirtualScrollProps): VirtualScrollReturn {
   const containerRef = ref<HTMLElement | null>(null);
@@ -11,37 +15,56 @@ export function useVirtualScroll(props: VirtualScrollProps): VirtualScrollReturn
   const buffer = props.buffer ?? 1;
   const visibleCount = Math.ceil(props.containerHeight / props.itemHeight) + buffer * 2;
 
-  const startIndex = ref(0);
-  const endIndex = ref(0);
+  const scrollState = ref<ScrollState>({
+    startIndex: 0,
+    endIndex: 0,
+    offsetY: 0,
+    totalHeight: 0,
+    visibleCount
+  });
 
-  // Обновление видимых элементов
   const updateVisibleItems = (): void => {
-    const newStartIndex = Math.max(0, Math.floor(offsetY.value / props.itemHeight) - buffer);
-    const newEndIndex = Math.min(props.items.length, newStartIndex + visibleCount);
+    if (!containerRef.value) return;
 
-    if (newStartIndex !== startIndex.value || newEndIndex !== endIndex.value) {
-      startIndex.value = newStartIndex;
-      endIndex.value = newEndIndex;
-      visibleItems.value = props.items.slice(startIndex.value, endIndex.value);
+    const newStartIndex = Math.max(
+        0,
+        Math.floor(offsetY.value / props.itemHeight) - buffer
+    );
+
+    const newEndIndex = Math.min(
+        props.items.length,
+        newStartIndex + visibleCount
+    );
+
+    if (
+        newStartIndex !== scrollState.value.startIndex ||
+        newEndIndex !== scrollState.value.endIndex
+    ) {
+      scrollState.value = {
+        ...scrollState.value,
+        startIndex: newStartIndex,
+        endIndex: newEndIndex,
+        offsetY: offsetY.value
+      };
+
+      visibleItems.value = props.items.slice(newStartIndex, newEndIndex);
     }
   };
 
-  // Обработчик скролла
   const handleScroll = (): void => {
+    if (!containerRef.value) return;
+    offsetY.value = containerRef.value.scrollTop;
+    updateVisibleItems();
+  };
+
+  const resetScroll = (): void => {
     if (containerRef.value) {
-      offsetY.value = containerRef.value.scrollTop;
+      containerRef.value.scrollTop = 0;
+      offsetY.value = 0;
       updateVisibleItems();
     }
   };
 
-  // Сброс скролла
-  const resetScroll = (): void => {
-    if (containerRef.value) {
-      containerRef.value.scrollTop = 0;
-    }
-  };
-
-  // Инициализация при монтировании
   onMounted(() => {
     if (containerRef.value) {
       containerRef.value.addEventListener('scroll', handleScroll, { passive: true });
@@ -50,14 +73,12 @@ export function useVirtualScroll(props: VirtualScrollProps): VirtualScrollReturn
     updateVisibleItems();
   });
 
-  // Очистка при размонтировании
   onUnmounted(() => {
     if (containerRef.value) {
       containerRef.value.removeEventListener('scroll', handleScroll);
     }
   });
 
-  // Реактивное обновление при изменении items
   watch(
       () => props.items,
       () => {
@@ -73,5 +94,6 @@ export function useVirtualScroll(props: VirtualScrollProps): VirtualScrollReturn
     totalHeight,
     offsetY,
     resetScroll,
+    scrollState,
   };
 }

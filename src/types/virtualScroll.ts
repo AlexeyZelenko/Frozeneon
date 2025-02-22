@@ -14,4 +14,13 @@ export interface VirtualScrollReturn {
     totalHeight: Ref<number>;
     offsetY: Ref<number>;
     resetScroll: () => void;
+    scrollState: Ref<ScrollState>;
+}
+
+export interface ScrollState {
+    startIndex: number;
+    endIndex: number;
+    offsetY: number;
+    totalHeight: number;
+    visibleCount: number;
 }
